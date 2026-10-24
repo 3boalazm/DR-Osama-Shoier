@@ -1600,6 +1600,26 @@ svg {
 .footer-links a:hover {
   color: var(--gold-soft);
 }
+.footer-social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+.footer-social .social-btn {
+  min-height: 34px;
+  padding: 0;
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.62);
+}
+.footer-social .social-btn.is-icon {
+  width: 34px;
+}
+.footer-social .social-btn:hover {
+  border-color: var(--gold-soft);
+  color: var(--gold-soft);
+}
 
 /* ─────────────────────────── Install sheet ──────────────────────── */
 
@@ -2524,6 +2544,55 @@ svg {
   width: 15px;
   height: 15px;
   flex: none;
+}
+
+/* ── social links ── */
+
+.social-title {
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.social-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.social-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: border-color 0.2s var(--ease), color 0.2s var(--ease);
+}
+.social-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold-deep);
+}
+.social-btn svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.social-btn.is-icon {
+  justify-content: center;
+  width: 38px;
+  padding: 0;
+}
+.social-name {
+  white-space: nowrap;
 }
 
 /* ── privacy ── */
