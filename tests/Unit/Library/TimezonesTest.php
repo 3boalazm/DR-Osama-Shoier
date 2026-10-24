@@ -50,7 +50,32 @@ class TimezonesTest extends TestCase
     {
         $timezones = $this->timezones();
 
-        $this->assertSame('Calcutta (+05:30)', $timezones->get_timezone_name('Asia/Calcutta'));
+        // Deprecated identifiers are not offered for selection, but existing records may still hold one of
+        // them, so they must resolve to a label as well. Which identifiers count as deprecated changes with
+        // every timezone database release (e.g. "Asia/Calcutta" was retired altogether), so the list is read
+        // from the runtime instead of being hardcoded to one entry.
+        $current = DateTimeZone::listIdentifiers();
+        $deprecated = array_values(array_diff(DateTimeZone::listIdentifiers(DateTimeZone::ALL_WITH_BC), $current));
+
+        $this->assertNotEmpty($deprecated, 'The runtime is expected to know at least one deprecated identifier.');
+
+        $resolved = [];
+
+        foreach ($deprecated as $identifier) {
+            $label = $timezones->get_timezone_name($identifier);
+
+            if ($label === null) {
+                // The list also contains entries that are not timezones at all (e.g. "leapseconds").
+                continue;
+            }
+
+            $resolved[$identifier] = $label;
+
+            $this->assertMatchesRegularExpression('/^.+\s\([+-]\d{2}:\d{2}\)$/', $label, $identifier);
+        }
+
+        $this->assertNotEmpty($resolved, 'At least one deprecated identifier has to resolve to a label.');
+
         $this->assertNull($timezones->get_timezone_name('Not/AZone'));
     }
 }
