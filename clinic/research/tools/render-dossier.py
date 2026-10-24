@@ -16,6 +16,7 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 RESEARCH = os.path.dirname(HERE)
+PROTOTYPE = os.path.join(os.path.dirname(RESEARCH), "prototype")
 
 # ── the design system ──────────────────────────────────────────────────────
 # Kept in one place so the rendered page and the source Markdown agree.
@@ -161,6 +162,22 @@ CSS = """
     section{break-inside:avoid-page}
     a{color:#000;border:0}
   }
+  /* ── doc bar ──────────────────────────────────────── */
+  .doc-bar{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    max-width:var(--maxw);margin:0 auto;padding:16px 20px 0
+  }
+  .doc-back{
+    display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:600;
+    color:var(--accent);border-bottom:0
+  }
+  .doc-back:hover{text-decoration:underline}
+  .doc-badge{
+    font-size:11.5px;font-weight:700;letter-spacing:.06em;color:var(--gold);
+    background:color-mix(in srgb,var(--gold) 12%,transparent);
+    border-radius:999px;padding:4px 11px
+  }
+  @media print{.doc-bar{display:none}}
 """
 
 TEMPLATE = """<!DOCTYPE html>
@@ -170,9 +187,20 @@ TEMPLATE = """<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title}</title>
 <meta name="description" content="{description}">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#faf7f2">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="د. أسامة شعير">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <style>{css}</style>
 </head>
 <body>
+<div class="doc-bar">
+  <a class="doc-back" href="index.html">→ العودة للموقع</a>
+  <span class="doc-badge">ملف بحثي · مرجع داخلي</span>
+</div>
+
 <div class="wrap">
 
 <header class="cover">
@@ -360,9 +388,19 @@ def convert(md):
 
 def main():
     src = sys.argv[1] if len(sys.argv) > 1 else os.path.join(RESEARCH, "دوسيه-أسامة-شعير.md")
-    dst = os.path.splitext(src)[0] + ".html"
+    # The dossier is a page of the site, not a file that sits beside the
+    # Markdown: `clinic/research/` is outside the Vercel root, so an HTML
+    # written here would never deploy. It lands in the prototype instead.
+    dst = os.path.join(PROTOTYPE, "dossier.html")
 
     md = open(src, encoding="utf-8").read()
+
+    # A pointer at the published version is a note for whoever reads the
+    # Markdown in the repo — it must not become the cover subtitle of the
+    # page it points at.
+    note = re.search(r"^>\s*\*\*النسخة المنشورة:\*\*.*(?:\n>\s*.*)*", md, re.M)
+    if note:
+        md = md[: note.start()] + md[note.end() :]
 
     # The cover block is the Markdown title + the first blockquote.
     title_line = re.search(r"^#\s+(.+)$", md, re.M).group(1).strip()

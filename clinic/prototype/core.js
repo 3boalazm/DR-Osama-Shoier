@@ -21,7 +21,9 @@
     { id: 'home', href: 'index.html', key: 'nav.home' },
     { id: 'booking', href: 'booking.html', key: 'nav.book' },
     { id: 'clinic', href: 'clinic.html', key: 'nav.clinic' },
+    { id: 'about', href: 'about.html', key: 'nav.about' },
     { id: 'privacy', href: 'privacy.html', key: 'nav.privacy' },
+    { id: 'studio', href: 'studio.html', key: 'nav.studio' },
   ];
 
   const PHONE = '+201229999120';
@@ -369,6 +371,15 @@
           <a href="https://wa.me/${WHATSAPP}" target="_blank" rel="noopener" data-i18n="footer.whatsapp"></a>
           <span aria-hidden="true">·</span>
           <a href="https://osamashaeer.com/" target="_blank" rel="noopener" data-i18n="footer.site"></a>
+        </p>
+        <p class="footer-docs">
+          <a href="studio.html" data-i18n="footer.studio"></a>
+          <span aria-hidden="true">·</span>
+          <a href="dossier.html" data-i18n="footer.dossier"></a>
+        </p>
+        <p class="footer-credit">
+          <span data-i18n="footer.credit"></span>
+          <a href="https://codeandcanvas.net/" target="_blank" rel="noopener">Code &amp; Canvas</a>
         </p>
         <div class="footer-social" data-socials="icons"></div>
       </div>`;

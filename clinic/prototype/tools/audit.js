@@ -22,7 +22,7 @@ const read = f => fs.readFileSync(path.join(ROOT, f), 'utf8');
 /* Every page and every script, not just the home page: a class, an
    asset or a translation key can go missing on page four just as easily
    as on page one. */
-const PAGES = ['index.html', 'booking.html', 'clinic.html', 'privacy.html'];
+const PAGES = ['index.html', 'booking.html', 'clinic.html', 'about.html', 'studio.html', 'privacy.html'];
 const SCRIPTS = ['core.js', 'booking.js', 'home.js'];
 
 const html = PAGES.map(read).join('\n');
@@ -331,9 +331,30 @@ const check = (name, ok, detail = '') => results.push({ name, ok: !!ok, detail }
 
   // The menu is the only navigation; a link to a page that does not exist
   // is a 404 the user finds before we do.
-  const menu = [...read('core.js').matchAll(/href:\s*'([\w.-]+\.html)'/g)].map(m => m[1]);
+  const core = read('core.js');
+  const menu = [...core.matchAll(/href:\s*'([\w.-]+\.html)'/g)].map(m => m[1]);
+  // Not every page belongs in the menu — the research file lives in the
+  // footer — but every page must be reachable from the chrome.
+  const linked = [...core.matchAll(/href="([\w.-]+\.html)"/g)].map(m => m[1]);
   check('menu entries exist', menu.length >= 4 && menu.every(exists), menu.join(', '));
-  check('menu covers every page', PAGES.every(f => menu.includes(f)), PAGES.filter(f => !menu.includes(f)).join(', '));
+  check('footer links exist', linked.every(exists), linked.filter(f => !exists(f)).join(', '));
+  check(
+    'every page is reachable from the chrome',
+    PAGES.every(f => menu.includes(f) || linked.includes(f)),
+    PAGES.filter(f => !menu.includes(f) && !linked.includes(f)).join(', '),
+  );
+
+  // The research file is a document, not a screen: it has to be a real
+  // page on disk and it has to carry the manifest, or the browser stops
+  // offering the install and the back link goes nowhere.
+  check('the research file is a page of the site', exists('dossier.html'));
+  check('the research file carries the manifest', /<link[^>]+rel="manifest"/.test(read('dossier.html')));
+  check('the research file links back to the site', /href="index\.html"/.test(read('dossier.html')));
+  check(
+    'the footer offers the developer page and the research file',
+    linked.includes('studio.html') && linked.includes('dossier.html'),
+    linked.join(', '),
+  );
 
   const deadLinks = new Set();
   for (const text of [html, app]) {

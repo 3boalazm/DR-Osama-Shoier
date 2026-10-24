@@ -114,10 +114,10 @@ async function waitFor(fn, ms = 5000) {
 
     /* ── nav ── */
     const links = $$('.nav-link');
-    check('desktop nav has 4 links', links.length === 4, `${links.length}`);
+    check('desktop nav has 6 links', links.length === 6, `${links.length}`);
     check('nav labels are translated', links.every(l => l.textContent.trim().length > 0), links.map(l => l.textContent).join('/'));
-    check('nav order is home, booking, clinic, privacy',
-      links.map(l => l.getAttribute('href')).join(',') === 'index.html,booking.html,clinic.html,privacy.html',
+    check('nav order is home, booking, clinic, about, privacy, studio',
+      links.map(l => l.getAttribute('href')).join(',') === 'index.html,booking.html,clinic.html,about.html,privacy.html,studio.html',
       links.map(l => l.getAttribute('href')).join(','));
     check('current page is marked', $('.nav-link.is-active')?.getAttribute('href') === 'index.html');
     check('current page has aria-current', $('.nav-link.is-active')?.getAttribute('aria-current') === 'page');
@@ -128,7 +128,7 @@ async function waitFor(fn, ms = 5000) {
     click(window, $('#menuBtn'));
     await sleep(120);
     check('menu opens', $('#menuSheet').hidden === false);
-    check('menu shows 4 links', $$('.menu-link').length === 4, `${$$('.menu-link').length}`);
+    check('menu shows 6 links', $$('.menu-link').length === 6, `${$$('.menu-link').length}`);
     check('menu marks the current page', $('.menu-link.is-active')?.getAttribute('href') === 'index.html');
     check('body scroll locked while open', doc.body.style.overflow === 'hidden');
     check('menu button reports expanded', $('#menuBtn').getAttribute('aria-expanded') === 'true');
@@ -211,6 +211,21 @@ async function waitFor(fn, ms = 5000) {
     check('footer rendered', !!$('.site-footer .footer-inner'));
     check('footer has the phone link', ($('.footer-links a')?.getAttribute('href') || '').startsWith('tel:'));
     check('footer year interpolated', /20\d\d/.test($('.site-footer').textContent), $('.site-footer').textContent.trim().slice(0, 40));
+    /* ── the documents in the footer ── */
+    const docs = $$('.footer-docs a');
+    check('footer lists the two documents', docs.length === 2, `${docs.length}`);
+    check('footer documents are the developer page and the research file',
+      docs.map(a => a.getAttribute('href')).join(',') === 'studio.html,dossier.html',
+      docs.map(a => a.getAttribute('href')).join(','));
+    check('footer document labels are translated', docs.every(a => a.textContent.trim().length > 1),
+      docs.map(a => a.textContent).join('/'));
+    const credit = $$('.footer-credit a');
+    check('footer credits the build', credit.length === 1, `${credit.length}`);
+    check('the build credit points at the studio', credit[0]?.getAttribute('href') === 'https://codeandcanvas.net/',
+      credit[0]?.getAttribute('href'));
+    check('the build credit opens safely',
+      credit[0]?.getAttribute('target') === '_blank' && /noopener/.test(credit[0]?.getAttribute('rel') || ''),
+      credit[0]?.getAttribute('rel'));
 
     /* ── social links ── */
     const footerSocial = $$('.footer-social .social-btn');
@@ -314,6 +329,57 @@ async function waitFor(fn, ms = 5000) {
     check('privacy links back to booking', ($('.page-cta a')?.getAttribute('href')) === 'booking.html');
     check('privacy tab title from the dictionary',
       window.document.title === 'الخصوصية والأمان — د. أسامة شعير', window.document.title);
+  }
+
+  {
+    const { window, $, $$, errors } = await mount('about.html');
+    check('about page has no errors', errors.length === 0, errors.join(' | '));
+    check('about tab title comes from the dictionary',
+      window.document.title === 'عن الدكتور — أسامة شعير', window.document.title);
+    check('about shows four numbers', $$('.about-stat').length === 4, `${$$('.about-stat').length}`);
+    check('about lists eight credentials', $$('.cred-item').length === 8, `${$$('.cred-item').length}`);
+    check('about lists five procedures', $$('.prose-list li').length === 5, `${$$('.prose-list li').length}`);
+    check('about lists five publications', $$('.pub-row').length === 5, `${$$('.pub-row').length}`);
+    check('every publication carries a year and a journal',
+      $$('.pub-row').every(r => r.querySelector('.pub-year') && r.querySelector('.pub-meta')),
+      `${$$('.pub-row').length}`);
+    check('about links to the doctor on Google Scholar',
+      ($('.pub-list')?.parentElement?.querySelector('a[href*="scholar.google.com"]')?.getAttribute('href') || '')
+        .includes('user=-X52gPsAAAAJ'),
+      $('.pub-list')?.parentElement?.querySelector('a[href*="scholar.google.com"]')?.getAttribute('href'));
+    check('about links to the research file',
+      !!$('a[href="dossier.html"]'), 'dossier.html');
+    check('about marks its own nav item', $('.nav-link.is-active')?.getAttribute('href') === 'about.html');
+    check('about links back to booking', ($('.page-cta a')?.getAttribute('href')) === 'booking.html');
+  }
+
+  {
+    const { window, $, $$, errors } = await mount('studio.html');
+    check('studio page has no errors', errors.length === 0, errors.join(' | '));
+    check('studio tab title comes from the dictionary',
+      window.document.title === 'المطوّر — Code & Canvas', window.document.title);
+    check('studio names the two founders', $$('.studio-person').length === 2, `${$$('.studio-person').length}`);
+    check('studio names Code & Canvas',
+      $$('.studio-person h3').map(h => h.textContent).join(',') === 'Ahmed M. Bedeer,Mustafa Aboalazm',
+      $$('.studio-person h3').map(h => h.textContent).join(','));
+    check('studio gives each founder a role',
+      $$('.studio-person .studio-role').every(r => r.textContent.trim().length > 1),
+      $$('.studio-person .studio-role').map(r => r.textContent).join('/'));
+    const buildSection = $$('.prose-block').find(s => s.querySelector('h2')?.getAttribute('data-i18n') === 'studio.build.title');
+    check('studio lists what was built', (buildSection?.querySelectorAll('.prose-list li').length) === 4,
+      `${buildSection?.querySelectorAll('.prose-list li').length}`);
+    check('studio carries the questionnaire card', !!$('.review-card#review'));
+    check('the questionnaire lists three facts', $$('.review-facts li').length === 3, `${$$('.review-facts li').length}`);
+    const cta = $('.review-cta');
+    check('the questionnaire points at the doctor\'s own review',
+      cta?.getAttribute('href') === 'https://codeandcanvas.net/osama-shaeer-review/',
+      cta?.getAttribute('href'));
+    check('the questionnaire opens safely',
+      cta?.getAttribute('target') === '_blank' && /noopener/.test(cta?.getAttribute('rel') || ''),
+      cta?.getAttribute('rel'));
+    check('studio links to the research file', !!$('a[href="dossier.html"]'), 'dossier.html');
+    check('studio marks its own nav item', $('.nav-link.is-active')?.getAttribute('href') === 'studio.html');
+    check('studio links back to booking', ($('.page-cta a')?.getAttribute('href')) === 'booking.html');
   }
 
   /* ═══════════════ Booking flow ═══════════════ */

@@ -9,7 +9,7 @@
 | الملف | المحتوى |
 | --- | --- |
 | **[research/دوسيه-أسامة-شعير.md](./research/دوسيه-أسامة-شعير.md)** | الملف التعريفي الشامل — المؤهلات، البحث العلمي، التقنيات المبتكرة، الأسعار المنشورة، العيادة، والحضور الرقمي |
-| **[research/دوسيه-أسامة-شعير.html](./research/دوسيه-أسامة-شعير.html)** | نفس الملف كصفحة HTML جاهزة للطباعة والمشاركة |
+| **[prototype/dossier.html](./prototype/dossier.html)** | نفس الملف كصفحة HTML جاهزة للطباعة والمشاركة — منشورة على الموقع |
 | **[RESEARCH-AND-RECOMMENDATION.md](./RESEARCH-AND-RECOMMENDATION.md)** | بحث السوق الكامل، المقارنة، التوصية، الالتزام القانوني، خطة التنفيذ |
 | **[prototype/](./prototype/)** | واجهة الحجز العربية القابلة للتجربة |
 | **[DEPLOY.md](./DEPLOY.md)** | خطوات النشر على Vercel |
@@ -61,7 +61,7 @@ node clinic/prototype/server.js
     ├── DEPLOY.md
     ├── research/
     │   ├── دوسيه-أسامة-شعير.md     ← الملف التعريفي
-    │   ├── دوسيه-أسامة-شعير.html   ← النسخة المطبوعة
     │   └── tools/render-dossier.py  ← مولّد صفحة HTML من الـ Markdown
     └── prototype/
+        └── dossier.html            ← النسخة المطبوعة (بتتولّد من الـ Markdown)
 ```
