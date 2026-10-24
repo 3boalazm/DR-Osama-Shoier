@@ -1,0 +1,11 @@
+# Files that must never be uploaded to Vercel.
+#
+# Without this, Vercel finds package.json and treats the project as a Node
+# server, so "/" ends up inside a serverless function and the site is dead.
+# Excluding package.json keeps the deployment purely static, with api/*.js
+# picked up as functions.
+package.json
+package-lock.json
+server.js
+tools/
+README.md
