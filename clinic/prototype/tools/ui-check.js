@@ -30,6 +30,19 @@ const read = f => fs.readFileSync(path.join(ROOT, f), 'utf8');
 const out = [];
 const check = (n, ok, d = '') => out.push({ n, ok: !!ok, d });
 
+/* The doctor's own accounts, in the order the site shows them. These are
+   the links the doctor published himself — every one of them was checked
+   against the site before it was put on the page, so a change here has to
+   be a change to the contract, not a typo. */
+const SOCIAL_URLS = [
+  'https://www.facebook.com/ProfOsamaShaeer',
+  'https://www.instagram.com/osamashaeer/',
+  'https://www.youtube.com/@penile.implant.expert',
+  'https://x.com/drosamashaeer',
+  'https://www.linkedin.com/in/prof-dr-osama-shaeer-2aa017108/',
+  'https://www.tiktok.com/@prof.osamashaeer',
+];
+
 async function mount(page, scripts = []) {
   const dom = new JSDOM(read(page), {
     url: `${BASE}/${page}`,
@@ -199,6 +212,18 @@ async function waitFor(fn, ms = 5000) {
     check('footer has the phone link', ($('.footer-links a')?.getAttribute('href') || '').startsWith('tel:'));
     check('footer year interpolated', /20\d\d/.test($('.site-footer').textContent), $('.site-footer').textContent.trim().slice(0, 40));
 
+    /* ── social links ── */
+    const footerSocial = $$('.footer-social .social-btn');
+    check('footer lists the six accounts', footerSocial.length === 6, `${footerSocial.length}`);
+    check('footer accounts are marks only', footerSocial.every(b => b.classList.contains('is-icon')),
+      footerSocial.map(b => b.className).join(' | '));
+    check('footer marks still have a name', footerSocial.every(b => (b.getAttribute('aria-label') || '').trim().length > 1),
+      footerSocial.map(b => b.getAttribute('aria-label')).join('/'));
+    check('footer accounts open safely', footerSocial.every(b => b.getAttribute('target') === '_blank' && /noopener/.test(b.getAttribute('rel') || '')),
+      footerSocial.map(b => b.getAttribute('rel')).join('/'));
+    check('footer accounts point at the doctor', footerSocial.map(b => b.getAttribute('href')).join(',') === SOCIAL_URLS.join(','),
+      footerSocial.map(b => b.getAttribute('href')).join(','));
+
     /* ── home content ── */
     check('hero headline present', $('.hero h1').textContent.includes('دقيقة'), $('.hero h1').textContent);
     check('hero portrait present', !!$('.doctor-photo img'));
@@ -263,6 +288,20 @@ async function waitFor(fn, ms = 5000) {
     check('clinic has three info cards', $$('.info-card').length === 3, `${$$('.info-card').length}`);
     check('each card has an icon', $$('.info-card .info-icon svg').length === 3, `${$$('.info-card .info-icon svg').length}`);
     check('address row is filled on every page', $$('[data-clinic="address"]').length === 1);
+
+    /* ── the doctor's accounts, on the contact card ── */
+    const row = $$('.social-row .social-btn');
+    check('clinic lists the six accounts', row.length === 6, `${row.length}`);
+    check('clinic accounts show their name', $$('.social-row .social-name').length === 6,
+      `${$$('.social-row .social-name').length}`);
+    check('clinic names are translated', $$('.social-row .social-name').every(n => n.textContent.trim().length > 1),
+      $$('.social-row .social-name').map(n => n.textContent).join('/'));
+    check('clinic accounts point at the doctor', row.map(b => b.getAttribute('href')).join(',') === SOCIAL_URLS.join(','),
+      row.map(b => b.getAttribute('href')).join(','));
+    check('clinic accounts open safely', row.every(b => b.getAttribute('target') === '_blank' && /noopener/.test(b.getAttribute('rel') || '')),
+      row.map(b => b.getAttribute('rel')).join('/'));
+    check('the contact card carries the social heading',
+      ($('.info-card .social-title')?.textContent || '').trim().length > 1, $('.info-card .social-title')?.textContent);
   }
 
   {

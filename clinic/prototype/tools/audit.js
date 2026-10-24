@@ -176,15 +176,25 @@ const check = (name, ok, detail = '') => results.push({ name, ok: !!ok, detail }
 
   // A key referenced from the markup or JS that no dictionary defines
   // renders as the literal string "undefined".
-  const refs = new Set([
-    ...[...html.matchAll(/data-i18n(?:-html|-alt)?="([^"]+)"/g)].map(m => m[1]),
-    ...[...app.matchAll(/\bt\('([a-z0-9_.]+)'/gi)].map(m => m[1]),
-  ]);
+  const collectRefs = src => {
+    const out = [];
+    // data-i18n, -html, -alt and -aria all name a key.
+    for (const m of src.matchAll(/data-i18n(?:-html|-alt|-aria)?="([^"]+)"/g)) out.push(m[1]);
+    for (const m of src.matchAll(/\bt\('([a-z0-9_.]+)'/gi)) out.push(m[1]);
+    return out;
+  };
+  const refs = new Set([...collectRefs(html), ...collectRefs(app)]);
   // data-title is read straight into document.title, so a missing key
   // puts the literal string "meta.bookingTitle" in the browser tab.
   for (const m of html.matchAll(/data-title="([^"]+)"/g)) refs.add(m[1]);
 
-  const missingRefs = [...refs].filter(k => !base.includes(k));
+  // A key built at runtime — social.${s.id} — is a prefix rather than a
+  // name, so it has to match at least one key that really exists.
+  const missingRefs = [...refs].filter(k => {
+    if (!k.includes('${')) return !base.includes(k);
+    const prefix = k.slice(0, k.indexOf('${'));
+    return !base.some(b => b.startsWith(prefix));
+  });
   check('all referenced keys exist', missingRefs.length === 0, missingRefs.join(', '));
 
   // {year} in one locale and {yr} in another silently prints the wrong thing.
@@ -251,6 +261,53 @@ const check = (name, ok, detail = '') => results.push({ name, ok: !!ok, detail }
   const coverage = prose.length ? voiced.length / prose.length : 1;
   check('[ar-SA] prose carries Gulf vocabulary', coverage >= 0.85,
     `${voiced.length}/${prose.length}`);
+}
+
+/* ─────────────────────── external links ─────────────────────── */
+
+{
+  // Every link that leaves the site must be https, and every link that
+  // opens a new tab must cut the opener window off with rel="noopener".
+  // A social row the doctor does not control is exactly the kind of
+  // link that ends up copied from a profile page by hand.
+  const anchors = [...(html + '\n' + app).matchAll(/<a\b[\s\S]*?>/g)].map(m => m[0]);
+  const insecure = [];
+  const unsafe = [];
+  for (const tag of anchors) {
+    const href = (tag.match(/href="([^"]*)"/) || [, ''])[1];
+    if (/^http:\/\//i.test(href)) insecure.push(href);
+    if (/target="_blank"/.test(tag) && !/\brel="[^"]*\bnoopener\b/.test(tag)) unsafe.push(href || tag);
+  }
+  check('every external link is https and opens safely',
+    insecure.length === 0 && unsafe.length === 0,
+    `insecure: ${insecure.join(', ')} | unsafe: ${unsafe.join(', ')}`);
+}
+
+/* ─────────────────────── social accounts ────────────────────── */
+
+{
+  // The social buttons are generated from a list of platforms, and each
+  // one takes its name from the dictionary. A platform added to that list
+  // without a translation would put a raw key on the screen.
+  const sandbox = { window: {} };
+  new Function('window', i18n)(sandbox.window);
+  const flat = (o, p = '', r = {}) => {
+    for (const [k, v] of Object.entries(o)) {
+      const key = p ? `${p}.${k}` : k;
+      if (v && typeof v === 'object') flat(v, key, r);
+      else r[key] = v;
+    }
+    return r;
+  };
+  const dictKeys = Object.keys(flat(sandbox.window.I18N['ar-EG']));
+  const socials = [...app.matchAll(/\{\s*id:\s*'([a-z]+)',\s*url:\s*'(https?:\/\/[^']+)'/g)];
+  const missing = socials.filter(([, id]) => !dictKeys.includes(`social.${id}`)).map(([, id]) => id);
+  check('every social platform has a translation',
+    socials.length > 0 && missing.length === 0,
+    `${socials.length} platforms, missing: ${missing.join(', ')}`);
+
+  const insecure = socials.filter(([, , url]) => !url.startsWith('https://')).map(([, id]) => id);
+  check('every social link is https', insecure.length === 0, insecure.join(', '));
 }
 
 /* ───────────────────────── page structure ───────────────────────── */

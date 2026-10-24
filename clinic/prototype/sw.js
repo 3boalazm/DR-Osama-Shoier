@@ -10,7 +10,7 @@
      • Anything else                 → network, falling back to cache.
    ══════════════════════════════════════════════════════════ */
 
-const VERSION = 'v4';
+const VERSION = 'v5';
 const SHELL_CACHE = `shell-${VERSION}`;
 const RUNTIME_CACHE = `runtime-${VERSION}`;
 

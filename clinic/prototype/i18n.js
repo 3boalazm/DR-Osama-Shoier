@@ -133,6 +133,15 @@ window.I18N = {
     unit: { minutes: 'دقيقة', currency: 'ج.م' },
 
     tag: { popular: 'الأكثر طلبًا', new: 'جديد' },
+    social: {
+      title: 'تابعنا',
+      facebook: 'فيسبوك',
+      instagram: 'انستجرام',
+      youtube: 'يوتيوب',
+      x: 'إكس',
+      linkedin: 'لينكدإن',
+      tiktok: 'تيك توك',
+    },
 
     err: {
       name: 'اكتب الاسم الأول (حرفين على الأقل).',
@@ -394,6 +403,15 @@ window.I18N = {
     unit: { minutes: 'دقيقة', currency: 'ج.م' },
 
     tag: { popular: 'الأكثر طلبًا', new: 'جديد' },
+    social: {
+      title: 'تابعنا على حساباتنا',
+      facebook: 'فيسبوك',
+      instagram: 'انستجرام',
+      youtube: 'يوتيوب',
+      x: 'إكس',
+      linkedin: 'لينكدإن',
+      tiktok: 'تيك توك',
+    },
 
     err: {
       name: 'اكتب اسمك الأول (حرفين على الأقل).',
@@ -655,6 +673,15 @@ window.I18N = {
     unit: { minutes: 'min', currency: 'EGP' },
 
     tag: { popular: 'Most booked', new: 'New' },
+    social: {
+      title: 'Follow us',
+      facebook: 'Facebook',
+      instagram: 'Instagram',
+      youtube: 'YouTube',
+      x: 'X',
+      linkedin: 'LinkedIn',
+      tiktok: 'TikTok',
+    },
 
     err: {
       name: 'Please enter your first name (at least 2 characters).',
