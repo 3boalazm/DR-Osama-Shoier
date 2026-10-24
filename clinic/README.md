@@ -21,6 +21,8 @@ node clinic/prototype/server.js
 # http://localhost:4173
 ```
 
+أو على الإنترنت: **https://prototype-shaeer.vercel.app**
+
 ## ملخص التوصية
 
 - **العمود الفقري:** Easy!Appointments مستضاف ذاتيًا (سيرفر داخل مصر)

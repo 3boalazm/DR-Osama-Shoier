@@ -6,8 +6,7 @@
 
 ## ⚠️ خطوة مطلوبة منك (مرة واحدة)
 
-Vercel مش قادر ينشر دلوقتي عن طريق الـ API لأنه بيرفض أي نشر جديد للمشروع
-قبل ما يتأكد إنه قادر يكتشف نوع المشروع. الحل الرسمي هو **ربط GitHub**:
+الطريقة الرسمية هي **ربط GitHub**:
 
 1. افتح [vercel.com/account/login-connections](https://vercel.com/account/login-connections)
 2. عند **GitHub** اضغط **Connect**
@@ -15,6 +14,12 @@ Vercel مش قادر ينشر دلوقتي عن طريق الـ API لأنه ب�
 
 بعدها بقى أي `git push` على أي فرع بيتنشر تلقائيًا كـ Preview، و`main` كـ Production.
 من غير أي خطوة يدوية تانية.
+
+> **إعداد المشروع لازم يكون صح من أول مرة** — وإلا الـ build فشل. راجع
+> «الطريقة الأولى» بالأسفل: **Root Directory = `clinic/prototype`** و
+> **Project Name = `prototype-shaeer`** و**Build Command** فاضي.
+> لو اتساب بـ `Command "npm run build" exited with 1`، شوف قسم
+> [«🚨 لو شفت…»](#-لو-شفت-command-npm-run-build-exited-with-1-في-ال-build-log).
 
 ---
 
@@ -26,6 +31,7 @@ Vercel مش قادر ينشر دلوقتي عن طريق الـ API لأنه ب�
 
 | الإعداد | القيمة |
 | --- | --- |
+| **Project Name** | `prototype-shaeer` |
 | **Root Directory** | `clinic/prototype` |
 | **Framework Preset** | `Other` |
 | **Build Command** | *(اتركه فاضي)* |
@@ -34,10 +40,40 @@ Vercel مش قادر ينشر دلوقتي عن طريق الـ API لأنه ب�
 
 4. اضغط **Deploy**
 
-النتيجة: الموقع بيطلع على `https://<project>.vercel.app`
+النتيجة: الموقع بيطلع على `https://prototype-shaeer.vercel.app`
+
+> **ليه اسم المشروع مهم؟** الكود نفسه بيفترض الرابط `prototype-shaeer.vercel.app`
+> — في `twa-manifest.json` (الـ `host` بتاع تطبيق أندرويد) وفي خطوات الـ TWA في
+> `prototype/ANDROID.md`. لو اسم المشروع مختلف، الموقع هيشتغل بس **رابط التثبيت
+> على الموبايل هيكون غلط**. لو المشروع موجود باسم تاني، غيّر `host` في
+> `twa-manifest.json` مع كل الروابط في `ANDROID.md`.
 
 > مفيش build ولا dependencies — الملفات الثابتة تُخدم من الجذر،
 > وملفات `api/*.js` بتتحوّل تلقائيًا لـ Serverless Functions.
+
+## 🚨 لو شفت `Command "npm run build" exited with 1` في الـ build log
+
+ده **مش** خطأ في واجهة الحجز. معناه إن **Root Directory اترك على جذر الريبو**،
+فـ Vercel بنى الـ Easy!Appointments نفسه (مش الـ prototype) — وبنى الحزمة اللي
+في `package.json` في الجذر، و`gulp build` بتاعها بيحتاج Docker عشان يعمل
+`composer install` جوه `php-fpm`:
+
+```
+[20:10:20] Starting 'archive'...
+/bin/sh: line 1: docker: command not found
+[20:10:20] 'archive' errored after 172 ms
+```
+
+**السبب:** جذر الريبو هو تطبيق PHP، ومفيش PHP ولا Docker على builders لـ Vercel.
+
+**الحل:** راجع إعدادات المشروع واضبط **Root Directory = `clinic/prototype`**،
+و**Build Command** فاضي. بعد التعديل انشر من جديد.
+
+> **جذر الريبو هو Easy!Appointments (PHP) — واللي بيتنشر هو `clinic/prototype`
+> بس.** الاتنين مختلفين تمامًا: واحد تطبيق PHP، والتاني ملفات ثابتة + أربع دوال
+> serverless.
+
+---
 
 ## ⚠️ حاجتين لازم تتظبط مرة واحدة من لوحة Vercel
 
@@ -51,13 +87,13 @@ Vercel مش قادر ينشر دلوقتي عن طريق الـ API لأنه ب�
 
 ### ٢. تأكيد إن نوع المشروع «Other» مش «Node»
 
-لو Vercel شاف `package.json` جنب `app.js`، بيعتبر المشروع سيرفر Node وبياخد
-`app.js` كنقطة دخول — في الصفحة الرئيسية تشتغل ملف المتصفح جوه دالة serverless
+لو Vercel شاف `package.json` جنب `server.js`، بيعتبر المشروع سيرفر Node وبياخد
+`server.js` كنقطة دخول — في الصفحة الرئيسية تشتغل ملف المتصفح جوه دالة serverless
 وتطلع خطأ. عشان كده فيه `.vercelignore` بيستثني `package.json` و`server.js`
 و`tools/` من الرفع، و`framework: null` في `vercel.json`.
 
 **علامة إن ده حصل:** في الـ build log تلاقي
-`Build complete — Using app.js as the root entrypoint`.
+`Build complete — Using server.js as the root entrypoint`.
 لو ظهر، راجع `.vercelignore` الأول.
 
 ---
@@ -86,7 +122,7 @@ Vercel مش قادر ينشر دلوقتي عن طريق الـ API لأنه ب�
 node clinic/prototype/tools/smoke.js https://prototype-shaeer.vercel.app
 ```
 
-بيفحص ٤٧ حاجة: إن الصفحة نفسها شغالة (مش دالة بتقع)، كل ملف ثابت ونوعه،
+بيفحص ٧٤ حاجة: إن الصفحة نفسها شغالة (مش دالة بتقع)، كل ملف ثابت ونوعه،
 إن الملفات الداخلية محجوبة، الـ manifest وأيقوناته، والـ API بيرد فعلاً.
 وبيفرّق بين `500` (دالة بتقع) وشاشة تسجيل دخول Vercel (حماية النشر).
 
@@ -121,7 +157,7 @@ npx vercel --prod
 Set up and deploy? → Y
 Which scope? → حسابك
 Link to existing project? → N
-Project name? → dr-amro-booking
+Project name? → prototype-shaeer
 In which directory is your code located? → ./
 Want to modify these settings? → N
 ```
