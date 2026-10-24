@@ -14,8 +14,17 @@ https://prototype-shaeer.vercel.app
 ```
 
 لازم يكون **HTTPS** و**بدون حماية تسجيل دخول**. مشروع Vercel المرتبط بالحساب
-(`prototype-shaeer`) حالة الحماية فيه `ssoProtection: null` — أي أن الرابط مفتوح
-للعامة، وده شرط أساسي للتثبيت.
+(`prototype-shaeer`) — حمايته مضبوطة على `all_except_custom_domains`، أي إن
+روابط الدومين هي اللي مفتوحة. **اتأكد إن الرابط الرئيسي فعلاً بيفتح للزائر
+من غير تسجيل دخول** قبل ما تبعت الـ bubblewrap:
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' https://prototype-shaeer.vercel.app/
+# لازم 200 — لو 401 أو صفحة login، الحماية شغالة والتثبيت مش هيشتغل
+```
+
+لو رجّع 401، من لوحة Vercel:
+`Settings → Deployment Protection → Vercel Authentication → Disabled`.
 
 > ⚠️ لو فتحت التطبيق من **جوّه واتساب أو فيسبوك أو انستجرام**، الصفحة بتفتح في
 > WebView — ودي **ما بتعرفش تثبّت** PWA أصلًا. التطبيق بقى بيكتشف الحالة دي

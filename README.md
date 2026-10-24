@@ -46,6 +46,7 @@
 | **[`clinic/research/دوسيه-أسامة-شعير.md`](clinic/research/دوسيه-أسامة-شعير.md)** | الملف التعريفي الشامل: المؤهلات، البحث العلمي، التقنيات المبتكرة، الأسعار، العيادة، الحضور الرقمي |
 | **[`clinic/research/دوسيه-أسامة-شعير.html`](clinic/research/دوسيه-أسامة-شعير.html)** | نفس الملف كصفحة HTML جاهزة للطباعة |
 | **[`clinic/RESEARCH-AND-RECOMMENDATION.md`](clinic/RESEARCH-AND-RECOMMENDATION.md)** | بحث السوق، مقارنة الخيارات، الالتزام القانوني، خطة التنفيذ |
+| **[`clinic/DEPLOY.md`](clinic/DEPLOY.md)** | خطوات النشر على Vercel وإعدادات المشروع المطلوبة |
 | **[`clinic/DEPLOY.md`](clinic/DEPLOY.md)** | خطوات النشر على Vercel |
 | **[`clinic/prototype/`](clinic/prototype/)** | واجهة الحجز — الكود الكامل |
 
@@ -55,6 +56,8 @@
 node clinic/prototype/server.js
 # http://localhost:4173
 ```
+
+أو على الإنترنت: **https://prototype-shaeer.vercel.app**
 
 الصفحات: **الرئيسية** · **الحجز** (٤ خطوات) · **العيادة** · **الخصوصية** — بثلاث لغات
 (مصري · خليجي · إنجليزي) وليت/داكن.
@@ -70,6 +73,12 @@ cd clinic/prototype
 npm install          # اختياري — jsdom لسطر الفحص السلوكي بس
 npm run dev          # http://localhost:4173
 ```
+
+### النشر على Vercel
+
+المشروع منشور على **https://prototype-shaeer.vercel.app**.
+إعدادات Vercel **لازم** تكون: `Root Directory = clinic/prototype` و`Build Command` فاضي.
+تفاصيل كاملة وخطأ `docker: command not found` في [`clinic/DEPLOY.md`](clinic/DEPLOY.md).
 
 ### Easy!Appointments (نظام الحجز الكامل)
 
