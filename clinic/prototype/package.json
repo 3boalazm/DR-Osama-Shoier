@@ -1,0 +1,17 @@
+{
+  "name": "dr-osama-shaeer-booking",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Arabic/Gulf/English booking UI for Prof. Dr. Osama Shaeer Clinic (Easy!Appointments front-end)",
+  "license": "GPL-3.0",
+  "scripts": {
+    "dev": "node server.js",
+    "audit": "node tools/audit.js",
+    "smoke": "node tools/smoke.js",
+    "check:ui": "node tools/ui-check.js",
+    "check:install": "node tools/install-check.js"
+  },
+  "devDependencies": {
+    "jsdom": "^25.0.1"
+  }
+}
